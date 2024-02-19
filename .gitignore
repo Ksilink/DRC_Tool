@@ -14,7 +14,6 @@
 *.txt
 *.Cache
 .vs/
-publish/
 DRC/bin/
 DRC/obj/
 DRC/Service References/
