@@ -3583,9 +3583,10 @@ namespace DRC
                     Mat temp = CvInvoke.Imread(file, Emgu.CV.CvEnum.ImreadModes.Unchanged);
                     double scale_factor = 1.0 / (double)f13.numericUpDown7.Value;
                     CvInvoke.Resize(temp, dst_resize, new Size(0, 0), scale_factor, scale_factor, Emgu.CV.CvEnum.Inter.Cubic);
-                    image_width = dst_resize.Cols;
-                    image_height = dst_resize.Rows;                   
+                           
                 }
+                image_width = dst_resize.Cols;
+                image_height = dst_resize.Rows;
 
                 Bitmap my_bitmap = null;
 
