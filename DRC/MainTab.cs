@@ -2480,7 +2480,7 @@ namespace DRC
             string savePath = "";
             if (folderBrowserDialog2.SelectedPath == "")
             {
-                folderBrowserDialog2.SelectedPath = "O:\\BTSData\\MeasurementData\\";
+                folderBrowserDialog2.SelectedPath = "L:\\PROJECTS\\";
             }
 
             if (folderBrowserDialog2.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -2498,15 +2498,15 @@ namespace DRC
             {
                 string[] splitted_file = file.Split('_');
                 //string well = splitted_file[splitted_file.Count() - 2];
-                string well = splitted_file[2];
+                string well = splitted_file[2].Split('.')[0];
 
                 string[] splitted_file_plate = file.Split('\\');
                 string plate = splitted_file_plate[splitted_file_plate.Count() - 2];
 
                 //Console.WriteLine(plate);
                 //Console.WriteLine(well);
-                //if (file.Contains("F001"))
-                //{
+                if (file == savePath + "\\" + plate + "\\" + plate + "_" + well + ".jpg")
+                {
                     if (dict_plate_well_files.Keys.Contains(plate)) // check if a part of plate name is in the path
                     {
                         SortedDictionary<string, List<string>> dict_well_files = dict_plate_well_files.FirstOrDefault(kvp => kvp.Key.Contains(plate)).Value;
@@ -2534,7 +2534,7 @@ namespace DRC
 
                         dict_plate_well_files[plate] = dict_well_files;
                     }
-                //}
+                }
             }
 
             //// Print
@@ -2749,7 +2749,7 @@ namespace DRC
             }
         }
 
-        public void draw_images(string BATCH_ID, int BATCH_IDx, int cpd_nb)
+        public void draw_images_old(string BATCH_ID, int BATCH_IDx, int cpd_nb)
         {
 
             //f3.dataGridView1.Sort(f3.dataGridView1.Columns["Concentration"], System.ComponentModel.ListSortDirection.Descending);
@@ -2778,7 +2778,7 @@ namespace DRC
             //f3.dataGridView1.Refresh();
 
             ////f3.Show();
-
+            List<string> sel_check = checkedListBox1.CheckedItems.OfType<string>().ToList();
             foreach (DataGridViewRow row in f3.dataGridView3.Rows)
             {
                 string current_cpd = row.Cells["BATCH_ID"].Value.ToString();
@@ -2790,26 +2790,52 @@ namespace DRC
 
                     foreach (DataGridViewColumn col in f3.dataGridView1.Columns)
                     {
+
+
                         string col_name = col.HeaderText;
-                        if (col_name != "BATCH_ID" && col_name != "Plate" && col_name != "Well" && col_name != "Concentration"
+                        var match = sel_check.FirstOrDefault(stringToCheck => stringToCheck.Contains(col_name));
+
+                        if (match != null)
+                        {
+
+                            if (col_name != "BATCH_ID" && col_name != "Plate" && col_name != "Well" && col_name != "Concentration"
                             && col_name != "Class" && col_name != "CPD_ID" && !col_name.StartsWith("Status") && !col_name.StartsWith("Bound")
                             && !col_name.StartsWith("Fixed_Top") && !col_name.StartsWith("Data_Modified") && !col_name.StartsWith("Deselected"))
-                        {
-                            if (descriptors_dict.Keys.Contains(col_name))
                             {
-                                if (row.Cells[col_name].Value.ToString() != "Inactive" && row.Cells[col_name].Value.ToString() != "Not Fitted")
+                                if (descriptors_dict.Keys.Contains(col_name))
                                 {
-                                    descriptors_dict[col_name].Add(double.Parse(row.Cells[col_name].Value.ToString()));
+                                    if (row.Cells[col_name].Value.ToString() != "Inactive" && row.Cells[col_name].Value.ToString() != "Not Fitted")
+                                    {
+                                        try
+                                        {
+                                            double temp = double.Parse(row.Cells[col_name].Value.ToString());
+                                            descriptors_dict[col_name].Add(temp);
+                                        }
+                                        catch
+                                        {
+                                            continue;
+                                        }
+
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                List<double> my_list = new List<double>();
-                                if (row.Cells[col_name].Value.ToString() != "Inactive" && row.Cells[col_name].Value.ToString() != "Not Fitted")
+                                else
                                 {
-                                    my_list.Add(double.Parse(row.Cells[col_name].Value.ToString()));
+                                    List<double> my_list = new List<double>();
+                                    if (row.Cells[col_name].Value.ToString() != "Inactive" && row.Cells[col_name].Value.ToString() != "Not Fitted")
+                                    {
+                                        try
+                                        {
+                                            double temp = double.Parse(row.Cells[col_name].Value.ToString());
+                                            my_list.Add(temp);
+                                            descriptors_dict[col_name] = my_list;
+                                        }
+                                        catch
+                                        {
+                                            continue;
+                                        }
+                                    }
+
                                 }
-                                descriptors_dict[col_name] = my_list;
                             }
                         }
                     }
@@ -3290,17 +3316,18 @@ namespace DRC
                     my_bitmap = (mat.ToImage<Emgu.CV.Structure.Bgr, Byte>()).ToBitmap();
 
                 int replicate = (int)f13.numericUpDown6.Value;
-
+                //view_images_per_concentration = false;
                 if (view_images_per_concentration == true)
                 {
+                    //Console.WriteLine(files);
                     f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Style.WrapMode = DataGridViewTriState.True;
                     f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Value = BATCH_ID + "\r\n" + "\r\n" + plates[i];
                     f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[(counter - 1) / (total_plate_nb+1)].Value = (Image)my_bitmap;
+                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[(counter - 1) / total_plate_nb + 1].Value = (Image)my_bitmap;
 
                     if (replicate != 1) f12.dataGridView1.Columns[(counter - 1) / total_plate_nb + 1].Name = concentrations[((counter - 1) / total_plate_nb) * replicate].ToString();
-                    else f12.dataGridView1.Columns[(counter - 1) / (total_plate_nb+1)].Name = concentrations[((counter - 1)) * replicate].ToString();
+                    else f12.dataGridView1.Columns[(counter - 1) / total_plate_nb + 1].Name = concentrations[((counter - 1)) * replicate].ToString();
                 }
                 else
                 {
@@ -3335,6 +3362,281 @@ namespace DRC
             f12.toolStripProgressBar1.Visible = false;
 
             //Graphics g = this.CreateGraphics();
+
+            int height = image_height; // (int)(image_height / g.DpiY * 72.0f); //  g.DpiY
+            int width = image_width; // (int)(image_width / g.DpiX * 72.0f); // image_width; g.DpiX
+
+            for (int i = 0; i < f12.dataGridView1.Rows.Count; i++)
+            {
+                f12.dataGridView1.Rows[i].Height = height + 5;
+            }
+
+            if (view_images_per_concentration == true)
+            {
+                for (int j = 0; j < f12.dataGridView1.Columns.Count; j++)
+                {
+                    if (j == 0) f12.dataGridView1.Columns[j].Width = 125;
+                    else f12.dataGridView1.Columns[j].Width = width + 5;
+                }
+            }
+            else
+            {
+                f12.dataGridView1.Columns[0].Width = 125;
+                f12.dataGridView1.Columns[1].Width = width + 5;
+                f12.dataGridView1.Columns[2].Width = 125;
+            }
+
+        }
+
+        public void draw_images(string BATCH_ID, int BATCH_IDx, int cpd_nb)
+        {
+
+            List<string> plates = new List<string>();
+            List<string> wells = new List<string>();
+
+            List<double> concentrations = new List<double>();
+
+            Dictionary<string, List<double>> descriptors_dict = new Dictionary<string, List<double>>();
+
+            f3.dataGridView3.AllowUserToAddRows = false;
+
+            copy_data_grid_view(ref f3.dataGridView1, ref f3.dataGridView3);
+
+
+            List<string> sel_check = checkedListBox1.CheckedItems.OfType<string>().ToList();
+            foreach (DataGridViewRow row in f3.dataGridView3.Rows)
+            {
+                string current_cpd = row.Cells["BATCH_ID"].Value.ToString();
+                if (current_cpd == BATCH_ID)
+                {
+                    plates.Add(row.Cells["Plate"].Value.ToString());
+                    wells.Add(row.Cells["Well"].Value.ToString());
+                    concentrations.Add(double.Parse(row.Cells["Concentration"].Value.ToString()));
+
+                    foreach (DataGridViewColumn col in f3.dataGridView1.Columns)
+                    {
+                        string col_name = col.HeaderText;
+                        var match = sel_check.FirstOrDefault(stringToCheck => stringToCheck.Contains(col_name));
+
+                        if (match != null)
+                        {
+
+                            if (col_name != "BATCH_ID" && col_name != "Plate" && col_name != "Well" && col_name != "Concentration"
+                            && col_name != "Class" && col_name != "CPD_ID" && !col_name.StartsWith("Status") && !col_name.StartsWith("Bound")
+                            && !col_name.StartsWith("Fixed_Top") && !col_name.StartsWith("Data_Modified") && !col_name.StartsWith("Deselected"))
+                            {
+                                if (descriptors_dict.Keys.Contains(col_name))
+                                {
+                                    if (row.Cells[col_name].Value.ToString() != "Inactive" && row.Cells[col_name].Value.ToString() != "Not Fitted")
+                                    {
+                                        try
+                                        {
+                                            double temp = double.Parse(row.Cells[col_name].Value.ToString());
+                                            descriptors_dict[col_name].Add(temp);
+                                        }
+                                        catch
+                                        {
+                                            continue;
+                                        }
+
+                                    }
+                                }
+                                else
+                                {
+                                    List<double> my_list = new List<double>();
+                                    if (row.Cells[col_name].Value.ToString() != "Inactive" && row.Cells[col_name].Value.ToString() != "Not Fitted")
+                                    {
+                                        try
+                                        {
+                                            double temp = double.Parse(row.Cells[col_name].Value.ToString());
+                                            my_list.Add(temp);
+                                            descriptors_dict[col_name] = my_list;
+                                        }
+                                        catch
+                                        {
+                                            continue;
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            List<string> current_plates = plates.Distinct().ToList();
+            List<string> current_wells = wells.Distinct().ToList();
+
+            int rows = dict_plate_well_files.Keys.Distinct().ToList().Count() * (int)f13.numericUpDown6.Value;
+            int total_plate_nb = Math.Min(current_plates.Count() * (int)f13.numericUpDown6.Value, rows);
+            rows = total_plate_nb;
+
+            int cols = (int)(current_wells.Count() / (double)f13.numericUpDown6.Value);
+
+            int concentrations_per_cpd = concentrations.Count() / total_plate_nb;
+
+            //f12.dataGridView1.Columns.Add("Concentration","Concentration");
+
+            if (view_images_per_concentration == true)
+            {
+                if (BATCH_IDx == 0)
+                {
+                    f12.dataGridView1.Columns.Add(new DataGridViewTextBoxColumn());
+                    f12.dataGridView1.Columns[0].Name = "CPD/Plate";
+
+                    for (int i = 1; i < cols + 1; i++)
+                    {
+                        DataGridViewImageColumn img = new DataGridViewImageColumn();
+                        f12.dataGridView1.Columns.Insert(i, img);
+                    }
+
+                    f12.dataGridView1.RowCount = cpd_nb * rows;
+                }
+            }
+            else
+            {
+                if (f12.dataGridView1.ColumnCount == 0)
+                {
+                    f12.dataGridView1.Columns.Add(new DataGridViewTextBoxColumn());
+                    DataGridViewImageColumn img = new DataGridViewImageColumn();
+                    f12.dataGridView1.Columns.Insert(1, img);
+                    f12.dataGridView1.Columns.Add(new DataGridViewTextBoxColumn());
+
+                    f12.dataGridView1.Columns[0].Name = "BATCH_ID";
+                    f12.dataGridView1.Columns[1].Name = "Image";
+                    f12.dataGridView1.Columns[2].Name = "Concentration";
+
+                    DataGridViewTextBoxColumn new_col_plate = new DataGridViewTextBoxColumn();
+                    new_col_plate.Name = "Plate";
+                    f12.dataGridView1.Columns.Add(new_col_plate);
+
+                    DataGridViewTextBoxColumn new_col_well = new DataGridViewTextBoxColumn();
+                    new_col_well.Name = "Well";
+                    f12.dataGridView1.Columns.Add(new_col_well);
+
+                    foreach (var item in descriptors_dict)
+                    {
+                        string col_name = item.Key;
+
+                        DataGridViewTextBoxColumn new_col = new DataGridViewTextBoxColumn();
+                        new_col.Name = col_name;
+
+                        f12.dataGridView1.Columns.Add(new_col);
+                    }
+
+                    f12.dataGridView1.AllowUserToAddRows = false;
+                }
+            }
+
+            foreach (DataGridViewColumn col in f12.dataGridView1.Columns)
+            {
+                col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+
+            int image_width = 0;
+            int image_height = 0;
+            int counter = 0;
+
+            f12.toolStripProgressBar1.Visible = true;
+
+            for (int i = 0; i < wells.Count(); i++)
+            {
+                f12.toolStripProgressBar1.Value = (i + 1) * 100 / wells.Count();
+
+                List<string> files = new List<string>();
+
+                string current_plate = plates[i];
+                List<string> list_plates = dict_plate_well_files.Keys.ToList();
+
+                bool test_plate = false;
+
+                foreach (string plate_name in list_plates)
+                {
+                    if (plate_name.Contains(current_plate)) test_plate = true;
+                }
+
+                if (test_plate)
+                {
+                    SortedDictionary<string, List<string>> dict_well = dict_plate_well_files.FirstOrDefault(kvp => kvp.Key.Contains(plates[i])).Value;
+
+                    files = dict_well[wells[i]];
+                    counter++;
+
+                }
+                else
+                {
+                    continue;
+
+                }
+
+                
+
+                
+                files.Sort();
+                Mat dst_resize = new Mat();
+
+                foreach (string file in files)
+                {
+                    string method_norm = f13.comboBox3.SelectedItem.ToString();
+                    Mat temp = CvInvoke.Imread(file, Emgu.CV.CvEnum.ImreadModes.Unchanged);
+                    double scale_factor = 1.0 / (double)f13.numericUpDown7.Value;
+                    CvInvoke.Resize(temp, dst_resize, new Size(0, 0), scale_factor, scale_factor, Emgu.CV.CvEnum.Inter.Cubic);
+                    image_width = dst_resize.Cols;
+                    image_height = dst_resize.Rows;                   
+                }
+
+                Bitmap my_bitmap = null;
+
+                my_bitmap = (dst_resize.ToImage<Emgu.CV.Structure.Bgr, Byte>()).ToBitmap();
+
+
+
+                int replicate = (int)f13.numericUpDown6.Value;
+                //view_images_per_concentration = false;
+                if (view_images_per_concentration == true)
+                {
+                    //Console.WriteLine(files);
+                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Style.WrapMode = DataGridViewTriState.True;
+                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Value = BATCH_ID + "\r\n" + "\r\n" + plates[i];
+                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[(counter - 1) / total_plate_nb + 1].Value = (Image)my_bitmap;
+
+                    if (replicate != 1) f12.dataGridView1.Columns[(counter - 1) / total_plate_nb + 1].Name = concentrations[((counter - 1) / total_plate_nb) * replicate].ToString();
+                    else f12.dataGridView1.Columns[(counter - 1) / total_plate_nb + 1].Name = concentrations[((counter - 1)) * replicate].ToString();
+                }
+                else
+                {
+                    int index = f12.dataGridView1.Rows.Add(new DataGridViewRow());
+
+                    f12.dataGridView1.Rows[index].Cells[0].Value = BATCH_ID;
+                    f12.dataGridView1.Rows[index].Cells[0].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                    f12.dataGridView1.Rows[index].Cells[1].Value = (Image)my_bitmap;
+                    f12.dataGridView1.Rows[index].Cells[2].Value = concentrations[i];
+                    f12.dataGridView1.Rows[index].Cells[2].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                    f12.dataGridView1.Rows[index].Cells[3].Value = plates[i];
+                    f12.dataGridView1.Rows[index].Cells[3].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                    f12.dataGridView1.Rows[index].Cells[4].Value = wells[i];
+                    f12.dataGridView1.Rows[index].Cells[4].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                    foreach (var item in descriptors_dict)
+                    {
+                        string col_name = item.Key;
+                        f12.dataGridView1.Rows[index].Cells[col_name].Value = item.Value[i];
+                        f12.dataGridView1.Rows[index].Cells[col_name].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    }
+                }
+
+                dst_resize.Dispose();
+                
+            }
+
+            f12.toolStripProgressBar1.Visible = false;
 
             int height = image_height; // (int)(image_height / g.DpiY * 72.0f); //  g.DpiY
             int width = image_width; // (int)(image_width / g.DpiX * 72.0f); // image_width; g.DpiX
@@ -3571,7 +3873,7 @@ namespace DRC
                 TimeLine.checkedListBox1.Items.Add(current_file);
             }
 
-            for(int idx=0; idx<TimeLine.checkedListBox1.Items.Count; idx++)
+            for (int idx = 0; idx < TimeLine.checkedListBox1.Items.Count; idx++)
             {
 
                 TimeLine.checkedListBox1.SetItemChecked(idx, true);
@@ -7761,7 +8063,7 @@ namespace DRC
                     //covariance_matrix[3,3] = 0.2;
 
                     int dof = drc_points_y_enable.Count - 4;
-                 
+
                     double t_test_val = chart.DataManipulator.Statistics.InverseTDistribution(.05, dof);
 
                     //double sum_square_residuals = sum_sqaure_residuals(drc_points_x_enable, drc_points_y_enable, fit_parameters);
@@ -9169,7 +9471,7 @@ namespace DRC
             string compound_id2 = compound_id1.Replace(@"\", @"_");
 
             //string output_image = path + "/CPD_" + compound_id2 + "_" + descriptor_name + ".bmp";
-            string output_image= path + "/CPD_" + "temp" + "_" + descriptor_name + ".bmp";
+            string output_image = path + "/CPD_" + "temp" + "_" + descriptor_name + ".bmp";
             //System.Diagnostics.Debug.WriteLine("Write Image = " + output_image);
             chart.SaveImage(output_image, ChartImageFormat.Bmp);
 
