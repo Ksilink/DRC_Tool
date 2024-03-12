@@ -20,6 +20,7 @@ using System.Globalization;
 using System.Collections;
 using System.Data;
 using System.Drawing.Drawing2D;
+using System.ComponentModel;
 
 
 namespace DRC
@@ -2701,6 +2702,7 @@ namespace DRC
 
         public void draw_list_cpds(List<string> list_cpd)
         {
+            //f12.progressBarperwell.Visible = false;
             int progress = 0;
             foreach (string cpd in list_cpd)
             {
@@ -3401,7 +3403,7 @@ namespace DRC
             f3.dataGridView3.AllowUserToAddRows = false;
 
             copy_data_grid_view(ref f3.dataGridView1, ref f3.dataGridView3);
-
+            f3.dataGridView3.Sort(f3.dataGridView3.Columns["Well"], ListSortDirection.Ascending);
 
             List<string> sel_check = checkedListBox1.CheckedItems.OfType<string>().ToList();
             foreach (DataGridViewRow row in f3.dataGridView3.Rows)
@@ -3539,12 +3541,13 @@ namespace DRC
             int image_height = 0;
             int counter = 0;
 
-            f12.toolStripProgressBar1.Visible = true;
+            //f12.toolStripProgressBar1.Visible = true;
+            //f12.progressBarperwell.Visible = false;
 
             for (int i = 0; i < wells.Count(); i++)
             {
-                f12.toolStripProgressBar1.Value = (i + 1) * 100 / wells.Count();
-
+                //f12.progressBarperwell.Value = (i + 1) * 100 / wells.Count();
+                
                 List<string> files = new List<string>();
 
                 string current_plate = plates[i];
@@ -3603,10 +3606,19 @@ namespace DRC
                     f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Value = BATCH_ID + "\r\n" + "\r\n" + plates[i];
                     f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[(counter - 1) / total_plate_nb + 1].Value = (Image)my_bitmap;
+                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[(counter - 1) / total_plate_nb+1].Value = (Image)my_bitmap;
 
-                    if (replicate != 1) f12.dataGridView1.Columns[(counter - 1) / total_plate_nb + 1].Name = concentrations[((counter - 1) / total_plate_nb) * replicate].ToString();
+                    if (replicate != 1) f12.dataGridView1.Columns[(counter - 1) / total_plate_nb+1].Name = concentrations[((counter - 1) / total_plate_nb) * replicate].ToString();
                     else f12.dataGridView1.Columns[(counter - 1) / total_plate_nb + 1].Name = concentrations[((counter - 1)) * replicate].ToString();
+                    //Console.Write(counter);
+                    //Console.Write('|');
+                    //Console.Write(rows * BATCH_IDx + (counter - 1) % total_plate_nb);
+                    //Console.Write('|');
+                    //Console.Write(concentrations[((counter - 1)) * replicate]);
+                    //Console.Write('|');
+                    //Console.Write(files[0]);
+                    //Console.Write('|');
+                    //Console.WriteLine((counter - 1) / total_plate_nb + 1);
                 }
                 else
                 {
@@ -3637,7 +3649,7 @@ namespace DRC
                 
             }
 
-            f12.toolStripProgressBar1.Visible = false;
+            //f12.toolStripProgressBar1.Visible = false;
 
             int height = image_height; // (int)(image_height / g.DpiY * 72.0f); //  g.DpiY
             int width = image_width; // (int)(image_width / g.DpiX * 72.0f); // image_width; g.DpiX
