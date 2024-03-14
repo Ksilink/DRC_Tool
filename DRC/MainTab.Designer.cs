@@ -284,7 +284,7 @@
             // correlationsToolStripMenuItem2
             // 
             this.correlationsToolStripMenuItem2.Name = "correlationsToolStripMenuItem2";
-            this.correlationsToolStripMenuItem2.Size = new System.Drawing.Size(152, 22);
+            this.correlationsToolStripMenuItem2.Size = new System.Drawing.Size(138, 22);
             this.correlationsToolStripMenuItem2.Text = "Correlations";
             this.correlationsToolStripMenuItem2.Click += new System.EventHandler(this.correlationsToolStripMenuItem2_Click);
             // 
@@ -300,14 +300,14 @@
             // loadCurvesToolStripMenuItem
             // 
             this.loadCurvesToolStripMenuItem.Name = "loadCurvesToolStripMenuItem";
-            this.loadCurvesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadCurvesToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.loadCurvesToolStripMenuItem.Text = "Load curves";
             this.loadCurvesToolStripMenuItem.Click += new System.EventHandler(this.loadCurvesToolStripMenuItem_Click);
             // 
             // drawCurvesToolStripMenuItem
             // 
             this.drawCurvesToolStripMenuItem.Name = "drawCurvesToolStripMenuItem";
-            this.drawCurvesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.drawCurvesToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.drawCurvesToolStripMenuItem.Text = "Draw Curves";
             this.drawCurvesToolStripMenuItem.Click += new System.EventHandler(this.drawCurvesToolStripMenuItem_Click);
             // 
@@ -322,7 +322,7 @@
             // loadHitsToolStripMenuItem
             // 
             this.loadHitsToolStripMenuItem.Name = "loadHitsToolStripMenuItem";
-            this.loadHitsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadHitsToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.loadHitsToolStripMenuItem.Text = "Load Hits";
             this.loadHitsToolStripMenuItem.Click += new System.EventHandler(this.loadHitsToolStripMenuItem_Click);
             // 
@@ -383,7 +383,7 @@
             // showToolStripMenuItem
             // 
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.showToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.showToolStripMenuItem.Text = "Show";
             this.showToolStripMenuItem.Click += new System.EventHandler(this.showToolStripMenuItem_Click);
             // 
@@ -399,14 +399,14 @@
             // pCAToolStripMenuItem
             // 
             this.pCAToolStripMenuItem.Name = "pCAToolStripMenuItem";
-            this.pCAToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.pCAToolStripMenuItem.Size = new System.Drawing.Size(106, 22);
             this.pCAToolStripMenuItem.Text = "PCA";
             this.pCAToolStripMenuItem.Click += new System.EventHandler(this.pCAToolStripMenuItem_Click);
             // 
             // tSNEToolStripMenuItem
             // 
             this.tSNEToolStripMenuItem.Name = "tSNEToolStripMenuItem";
-            this.tSNEToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.tSNEToolStripMenuItem.Size = new System.Drawing.Size(106, 22);
             this.tSNEToolStripMenuItem.Text = "T-SNE";
             this.tSNEToolStripMenuItem.Click += new System.EventHandler(this.tSNEToolStripMenuItem_Click);
             // 
@@ -567,6 +567,7 @@
             // 
             this.toolStripProgressBar1.Name = "toolStripProgressBar1";
             this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
+            this.toolStripProgressBar1.Step = 1;
             this.toolStripProgressBar1.Visible = false;
             // 
             // button4

@@ -21,6 +21,7 @@ using System.Collections;
 using System.Data;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
+using System.Diagnostics;
 
 
 namespace DRC
@@ -2459,18 +2460,18 @@ namespace DRC
 
         static List<string> DirSearch(string sDir)
         {
-            List<string> Files = new List<string>();
+           // List<string> Files = new List<string>();
 
             //Console.WriteLine(sDir);
             if (sDir == "") return null;
 
-            foreach (string file in Directory.EnumerateFiles(sDir, "*.jpg", SearchOption.AllDirectories))
-            {
-                //Console.WriteLine(file);
-                Files.Add(file);
-            }
+            //foreach (string file in Directory.EnumerateFiles(sDir, "*.jpg", SearchOption.AllDirectories))
+            //{
+            //    //Console.WriteLine(file);
+            //    Files.Add(file);
+            //}
 
-            return Files;
+            return Directory.EnumerateFiles(sDir, "*.jpg", SearchOption.AllDirectories).ToList();
         }
 
         public void check_images()
@@ -2494,9 +2495,13 @@ namespace DRC
             List<string> list_img_path = DirSearch(savePath);
 
             if (list_img_path == null) return;
-
+            int cpt = 0;
+            //toolStripProgressBar1.Visible = true;
+            //toolStripProgressBar1.Maximum = list_img_path.Count;
             foreach (string file in list_img_path)
             {
+                //toolStripProgressBar1.Value = cpt / list_img_path.Count;
+                cpt++;
                 string[] splitted_file = file.Split('_');
                 //string well = splitted_file[splitted_file.Count() - 2];
                 string well = splitted_file[2].Split('.')[0];
@@ -2537,7 +2542,7 @@ namespace DRC
                     }
                 }
             }
-
+            //toolStripProgressBar1.Value = 0;
             //// Print
             //foreach (var plate in dict_plate_well_files)
             //{
@@ -2704,11 +2709,12 @@ namespace DRC
         {
             //f12.progressBarperwell.Visible = false;
             int progress = 0;
+            f12.toolStripProgressBar1.Maximum = list_cpd.Count;
             foreach (string cpd in list_cpd)
             {
                 draw_images(cpd, progress, list_cpd.Count);
                 progress++;
-                f12.toolStripProgressBar1.Value = progress * 100 / list_cpd.Count;
+                f12.toolStripProgressBar1.Value = progress;
 
             }
 
@@ -3401,6 +3407,7 @@ namespace DRC
             Dictionary<string, List<double>> descriptors_dict = new Dictionary<string, List<double>>();
 
             f3.dataGridView3.AllowUserToAddRows = false;
+            
 
             copy_data_grid_view(ref f3.dataGridView1, ref f3.dataGridView3);
             f3.dataGridView3.Sort(f3.dataGridView3.Columns["Well"], ListSortDirection.Ascending);
@@ -3547,7 +3554,7 @@ namespace DRC
             for (int i = 0; i < wells.Count(); i++)
             {
                 //f12.progressBarperwell.Value = (i + 1) * 100 / wells.Count();
-                
+
                 List<string> files = new List<string>();
 
                 string current_plate = plates[i];
@@ -3574,9 +3581,9 @@ namespace DRC
 
                 }
 
-                
 
-                
+
+
                 files.Sort();
                 Mat dst_resize = new Mat();
 
@@ -3586,7 +3593,7 @@ namespace DRC
                     Mat temp = CvInvoke.Imread(file, Emgu.CV.CvEnum.ImreadModes.Unchanged);
                     double scale_factor = 1.0 / (double)f13.numericUpDown7.Value;
                     CvInvoke.Resize(temp, dst_resize, new Size(0, 0), scale_factor, scale_factor, Emgu.CV.CvEnum.Inter.Cubic);
-                           
+
                 }
                 image_width = dst_resize.Cols;
                 image_height = dst_resize.Rows;
@@ -3606,11 +3613,32 @@ namespace DRC
                     f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Value = BATCH_ID + "\r\n" + "\r\n" + plates[i];
                     f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[0].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-                    f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[(counter - 1) / total_plate_nb+1].Value = (Image)my_bitmap;
+                    int idx = ((counter - 1) % f12.dataGridView1.ColumnCount);
+                    int idx_old = (counter - 1) / total_plate_nb + 1;
+                    if ((counter - 1) / total_plate_nb + 1 < f12.dataGridView1.ColumnCount)
 
-                    if (replicate != 1) f12.dataGridView1.Columns[(counter - 1) / total_plate_nb+1].Name = concentrations[((counter - 1) / total_plate_nb) * replicate].ToString();
-                    else f12.dataGridView1.Columns[(counter - 1) / total_plate_nb + 1].Name = concentrations[((counter - 1)) * replicate].ToString();
-                    //Console.Write(counter);
+                    {
+                        f11.dataGridView1.Rows[BATCH_IDx].Cells[0].Style.BackColor = Color.Green;
+                        f12.dataGridView1.Rows[rows * BATCH_IDx + (counter - 1) % total_plate_nb].Cells[idx_old].Value = (Image)my_bitmap;
+
+                        if (replicate != 1) f12.dataGridView1.Columns[idx_old].Name = concentrations[idx_old * replicate].ToString();
+                        else f12.dataGridView1.Columns[idx_old].Name = concentrations[((counter - 1)) * replicate].ToString();
+                    }
+                    else
+                    {
+                        f11.dataGridView1.Rows[BATCH_IDx].Cells[0].Style.BackColor = Color.Red;
+                    }
+                    //catch
+                    //{
+                    //    System.Windows.Forms.MessageBox.Show("An error has occurred with:"+BATCH_ID,"Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    //    continue;
+                    //}
+                    //finally
+                    //{
+                    //    Console.WriteLine(BATCH_ID);
+
+                    //}
+                    //Console.WriteLine((counter - 1) % f12.dataGridView1.ColumnCount);
                     //Console.Write('|');
                     //Console.Write(rows * BATCH_IDx + (counter - 1) % total_plate_nb);
                     //Console.Write('|');
@@ -3646,7 +3674,7 @@ namespace DRC
                 }
 
                 dst_resize.Dispose();
-                
+
             }
 
             //f12.toolStripProgressBar1.Visible = false;

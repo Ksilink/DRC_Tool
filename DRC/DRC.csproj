@@ -29,7 +29,7 @@
     <ProductName>DRC Tools</ProductName>
     <PublisherName>KSILINK</PublisherName>
     <SuiteName>DRC Tools</SuiteName>
-    <ApplicationRevision>18</ApplicationRevision>
+    <ApplicationRevision>19</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>

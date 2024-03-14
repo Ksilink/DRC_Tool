@@ -64,8 +64,10 @@
             // 
             // toolStripProgressBar1
             // 
+            this.toolStripProgressBar1.MarqueeAnimationSpeed = 1;
             this.toolStripProgressBar1.Name = "toolStripProgressBar1";
             this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
+            this.toolStripProgressBar1.Step = 1;
             // 
             // menuStrip1
             // 

@@ -170,10 +170,12 @@ namespace DRC
 
             if (if_list == false)
             {
+                this.Visible = false;
                 _form1.draw_images(selected_cpd, 0, 1);
             }
             else
             {
+                this.Visible = false;
                 _form1.draw_list_cpds(list_cpd);
             }
 
