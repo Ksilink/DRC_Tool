@@ -92,6 +92,7 @@ namespace DRC
                 }
 
                 toolStripProgressBar1.Visible = true;
+                toolStripProgressBar1.Maximum = 100;
                 //Loop through each row and read value from each column. 
                 for (int i = 0; i < dataGridView1.Rows.Count; i++)
                 {
